@@ -3,22 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRISPR Mutation Analyzer</title>
-    <script src="https://cdn.pyodide.org/pyodide.js"></script>
+    <title>CRISPR Analysis Tool</title>
+    <script src="https://pyodide-cdn2.iodide.io/v0.18.1/full/pyodide.js"></script>
+    <script>
+        async function loadPyodideAndPackages() {
+            let pyodide = await loadPyodide();
+            await pyodide.loadPackage("numpy"); // Load numpy
+            await pyodide.loadPackage("biopython"); // Load Biopython
+            return pyodide;
+        }
+
+        async function runPython() {
+            let pyodide = await loadPyodideAndPackages();
+            let result = await pyodide.runPythonAsync(`
+                from Bio.Seq import Seq
+                my_seq = Seq("AGTACACTGGT")
+                my_seq.reverse_complement()
+            `);
+            document.getElementById("result").innerText = `Reverse Complement: ${result}`;
+        }
+    </script>
 </head>
 <body>
-    <h1>CRISPR Mutation Analyzer</h1>
-    <textarea id="sequenceInput" placeholder="Enter DNA sequence here..."></textarea>
-    <input type="number" id="mutationPosition" placeholder="Position of mutation (0-based)" />
-    <input type="text" id="mutationType" placeholder="Mutation type (A/T/C/G)" />
-    <button id="analyzeButton">Analyze Mutation</button>
-    
-    <div id="results">
-        <h2>Results:</h2>
-        <p>Original Sequence: <span id="originalSequence"></span></p>
-        <p>Edited Sequence: <span id="editedSequence"></span></p>
-    </div>
-
-    <script src="script.js"></script>
+    <h1>CRISPR Analysis Tool</h1>
+    <button onclick="runPython()">Run Python</button>
+    <p id="result"></p>
 </body>
 </html>
